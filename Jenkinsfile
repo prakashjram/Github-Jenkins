@@ -1,59 +1,32 @@
 pipeline {
     agent any
+    
+    environment {
+        EC2_IP = '13.201.168.125'  // Replace with your EC2 instance IP
+        EC2_USER = 'ubuntu'    // Replace with your EC2 instance's SSH user
+        SSH_KEY = '/home/ubuntu/.ssh/jpdrpl.pem'  // Path to your SSH private key
+    }
+
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                // Clone your repository from GitHub
-                git url: 'https://github.com/prakashjram/Github-Jenkins.git', branch: 'main'
+                // Checkout code from Git
+                git 'https://github.com/prakashjram/Github-Jenkins.git'  // Replace with your Git repo URL
             }
         }
         
-        stage('Install Apache and Deploy') {
+        stage('Deploy to EC2') {
             steps {
-                sshagent(['75658dfc-bd67-413f-a38d-90dcb5e69c3a']) {
-                    sh '''
-                    # SSH into EC2 instance and install Apache (httpd)
-                    ssh -o StrictHostKeyChecking=no ubuntu@13.201.168.125 << EOF
-                        # Step 1: Update and install Apache (httpd)
-                        echo "Updating packages and installing Apache..."
-                        sudo apt update -y
-                        sudo apt install apache2 -y
-                        
-                        # Step 2: Check if /var/www/html exists
-                        if [ ! -d /var/www/html ]; then
-                            echo "/var/www/html does not exist, creating it..."
-                            sudo mkdir -p /var/www/html
-                        fi
-
-                        # Step 3: Ensure the repo is initialized in /var/www/html
-                        cd /var/www/html || exit 1
-                        if [ ! -d .git ]; then
-                            echo "Initializing Git repository in /var/www/html..."
-                            sudo git init
-                            sudo git remote add origin https://github.com/prakashjram/Github-Jenkins.git
-                        fi
-
-                        # Step 4: Pull latest code from GitHub
-                        echo "Pulling latest code from GitHub..."
-                        sudo git pull origin main
-                        
-                        # Step 5: Restart Apache to apply changes
-                        echo "Restarting Apache service..."
-                        sudo systemctl restart apache2
-
-                        echo "Deployment complete!"
+                script {
+                    // Run SSH command to deploy directly in EC2
+                    sh """
+                    ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} << 'EOF'
+                    echo "Deployment started on EC2"
+                    # Add other deployment commands here as needed
                     EOF
-                    '''
+                    """
                 }
             }
-        }
-    }
-    post {
-        failure {
-            echo 'Deployment failed.'
-        }
-        success {
-            echo 'Deployment was successful!'
         }
     }
 }
