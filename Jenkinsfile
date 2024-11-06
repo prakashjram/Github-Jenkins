@@ -1,46 +1,59 @@
 pipeline {
     agent any
-    environment {
-        SSH_CREDENTIALS_ID = '75658dfc-bd67-413f-a38d-90dcb5e69c3a'  // Replace with your Jenkins SSH credentials ID
-    }
     stages {
         stage('Checkout Code') {
             steps {
-                // Checking out code from your Git repository
+                // Clone your repository from GitHub
                 git url: 'https://github.com/prakashjram/Github-Jenkins.git', branch: 'main'
             }
         }
-        stage('Build') {
+        
+        stage('Install Apache and Deploy') {
             steps {
-                // Add any build steps here if required
-                echo 'Building the application...'
-                // Example: sh 'mvn clean install'  // Uncomment if using Maven for Java apps
-            }
-        }
-        stage('Deploy to EC2') {
-            steps {
-                script {
-                    // Use SSH credentials to access EC2 instance
-                    sshagent([SSH_CREDENTIALS_ID]) {
-                        // Connecting to the EC2 instance and executing deployment commands
-                        sh '''
-                                ssh -o StrictHostKeyChecking=no ubuntu@13.201.168.125 '  
-                                cd /var/www/html  # Adjust the path if your deployment folder is different
-                                git pull origin main  # Pulls the latest code from your repository
-                                sudo systemctl restart httpd  # Restarts Apache server to apply changes
-                            '
-                        '''
-                    }
+                sshagent(['75658dfc-bd67-413f-a38d-90dcb5e69c3a']) {
+                    sh '''
+                    # SSH into EC2 instance and install Apache (httpd)
+                    ssh -o StrictHostKeyChecking=no ubuntu@13.201.168.125 << EOF
+                        # Step 1: Update and install Apache (httpd)
+                        echo "Updating packages and installing Apache..."
+                        sudo apt update -y
+                        sudo apt install apache2 -y
+                        
+                        # Step 2: Check if /var/www/html exists
+                        if [ ! -d /var/www/html ]; then
+                            echo "/var/www/html does not exist, creating it..."
+                            sudo mkdir -p /var/www/html
+                        fi
+
+                        # Step 3: Ensure the repo is initialized in /var/www/html
+                        cd /var/www/html || exit 1
+                        if [ ! -d .git ]; then
+                            echo "Initializing Git repository in /var/www/html..."
+                            sudo git init
+                            sudo git remote add origin https://github.com/prakashjram/Github-Jenkins.git
+                        fi
+
+                        # Step 4: Pull latest code from GitHub
+                        echo "Pulling latest code from GitHub..."
+                        sudo git pull origin main
+                        
+                        # Step 5: Restart Apache to apply changes
+                        echo "Restarting Apache service..."
+                        sudo systemctl restart apache2
+
+                        echo "Deployment complete!"
+                    EOF
+                    '''
                 }
             }
         }
     }
     post {
-        success {
-            echo 'Deployment was successful!'
-        }
         failure {
             echo 'Deployment failed.'
+        }
+        success {
+            echo 'Deployment was successful!'
         }
     }
 }
