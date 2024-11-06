@@ -24,7 +24,7 @@ pipeline {
                     sshagent([SSH_CREDENTIALS_ID]) {
                         // Connecting to the EC2 instance and executing deployment commands
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@13.201.168.125 '
+                            ssh -o StrictHostKeyChecking=no ubuntu@13.201.168.125 '                           
                                 cd /var/www/html  # Adjust the path if your deployment folder is different
                                 git pull origin main  # Pulls the latest code from your repository
                                 sudo systemctl restart httpd  # Restarts Apache server to apply changes
