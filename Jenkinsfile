@@ -1,31 +1,30 @@
 pipeline {
     agent any
-    triggers {
-        pollSCM('H/5 * * * *') // Polling every 5 minutes
+    environment {
+        EC2_INSTANCE_IP = '13.201.168.125'
+        SSH_CREDENTIALS_ID = '75658dfc-bd67-413f-a38d-90dcb5e69c3a'  // Use the credential ID you set up in Jenkins
+        REMOTE_PATH = '/var/www/html'      // Path on EC2 where the app code should be deployed
     }
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                // Checkout the code from the branch you specified in Jenkins job config
+                // Check out the latest code from your Git repository
                 checkout scm
             }
         }
-        stage('Build') {
+        stage('Deploy to EC2') {
             steps {
-                echo "Building the project..."
-                // Add build steps here (e.g., compilation, tests)
-            }
-        }
-        stage('Test') {
-            steps {
-                echo "Running tests..."
-                // Add test steps here
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo "Deploying the project..."
-                // Add deployment steps here
+                sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                    sh """
+                    # Copy the code from Jenkins workspace to the EC2 instance
+                    scp -o StrictHostKeyChecking=no -r * ec2-user@${EC2_INSTANCE_IP}:${REMOTE_PATH}
+                    
+                    # Connect to EC2 and restart any required services
+                    ssh -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE_IP} << EOF
+                    sudo systemctl restart httpd   # Restart Apache (adjust if using Nginx or other service)
+                    EOF
+                    """
+                }
             }
         }
     }
