@@ -17,10 +17,12 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 script {
-                    // Run SSH command to deploy directly in EC2
-                    withCredentials([sshUserPrivateKey(credentialsId: '75658dfc-bd67-413f-a38d-90dcb5e69c3a', keyFileVariable: 'SSH_KEY')]) {
-                    // Run the SSH command using the provided key
-                    sh 'ssh -i ${SSH_KEY} ubuntu@3.7.45.98'
+                     sh """
+                    ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} << 'EOF'
+                    echo "Deployment started on EC2"
+                    # Add other deployment commands here as needed
+                    EOF
+                    """
                 }
             }
         }
