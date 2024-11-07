@@ -14,15 +14,16 @@ pipeline {
             }
         }
         
-        stage('Deploy to EC2') {
+         stage('Deploy to EC2') {
             steps {
                 script {
-                     sh """
-                    ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} << 'EOF'
-                    echo "Deployment started on EC2"
-                    # Add other deployment commands here as needed
-                    EOF
-                    """
+                    // Use SSH credentials stored in Jenkins
+                    withCredentials([sshUserPrivateKey(credentialsId: '75658dfc-bd67-413f-a38d-90dcb5e69c3a', keyFileVariable: 'SSH_KEY')]) {
+                        // Add EC2 instance to known hosts and connect
+                        sh '''
+                            ssh -i ${SSH_KEY} ubuntu@3.7.45.98 "echo 'Connected successfully'"
+                        '''
+                    }
                 }
             }
         }
