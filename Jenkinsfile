@@ -29,7 +29,7 @@ pipeline {
                             CREATE USER IF NOT EXISTS 'jpdrupal'@'localhost' IDENTIFIED BY '12345';
                             GRANT ALL PRIVILEGES ON jpdrupal.* TO 'jpdrupal'@'localhost';
                             FLUSH PRIVILEGES;
-                            MYSQL_EOF
+MYSQL_EOF
                             sudo apt install php php-mysql php-gd php-xml php-mbstring -y
                             cd /var/www/html
                             sudo wget -q https://ftp.drupal.org/files/projects/drupal-10.0.0.tar.gz
@@ -39,7 +39,7 @@ pipeline {
                             sudo chmod -R 755 /var/www/html/drupal
                             sudo systemctl restart apache2
                             echo "LAMP stack and Drupal 10 setup complete."
-                            EOF
+EOF
                         '''
                     }
                 }
