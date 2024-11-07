@@ -12,7 +12,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/prakashjram/Github-Jenkins.git'
             }
         }
-        hi
+        
         stage('Deploy to EC2') {
             steps {
                 script {
