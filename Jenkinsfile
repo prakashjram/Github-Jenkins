@@ -38,12 +38,12 @@ pipeline {
                                 sudo systemctl restart apache2
 
                                 # Download and extract Drupal 10
-                                cd /tmp
-                                curl -O https://ftp.drupal.org/files/projects/drupal-10.0.0.tar.gz
+                                cd /var/www/html
+                                wget https://www.drupal.org/download-latest/tar.gz -O drupal-10.0.0.tar.gz
                                 tar -xzvf drupal-10.0.0.tar.gz
 
                                 # Move Drupal files to Apache's root directory
-                                sudo mv drupal-10.0.0 /var/www/html/drupal
+                                mv drupal-* drupal
 
                                 # Set proper permissions
                                 sudo chown -R www-data:www-data /var/www/html/drupal
