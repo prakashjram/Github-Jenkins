@@ -25,14 +25,14 @@ pipeline {
                             sudo apt install apache2 -y
                             sudo apt install mysql-server -y
                             sudo mysql -u root <<MYSQL_EOF
-                            CREATE DATABASE jpdrupal;
-                            CREATE USER 'jpdrupal'@'localhost' IDENTIFIED BY '12345';
+                            CREATE DATABASE IF NOT EXISTS jpdrupal;
+                            CREATE USER IF NOT EXISTS 'jpdrupal'@'localhost' IDENTIFIED BY '12345';
                             GRANT ALL PRIVILEGES ON jpdrupal.* TO 'jpdrupal'@'localhost';
                             FLUSH PRIVILEGES;
                             MYSQL_EOF
                             sudo apt install php php-mysql php-gd php-xml php-mbstring -y
                             cd /var/www/html
-                            sudo wget https://ftp.drupal.org/files/projects/drupal-10.0.0.tar.gz
+                            sudo wget -q https://ftp.drupal.org/files/projects/drupal-10.0.0.tar.gz
                             sudo tar -xzvf drupal-10.0.0.tar.gz
                             sudo mv drupal-10.0.0 drupal
                             sudo chown -R www-data:www-data /var/www/html/drupal
