@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        EC2_IP = '3.7.45.98'  // Replace with your EC2 instance IP
+        EC2_IP = '35.154.122.163'  // Replace with your EC2 instance IP
         EC2_USER = 'ubuntu'    // Replace with your EC2 instance's SSH user
     }
 
