@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        EC2_IP = '35.154.122.163'  // Replace with your EC2 instance IP
-        EC2_USER = 'ubuntu'    // Replace with your EC2 instance's SSH user
+        EC2_IP = '35.154.122.163'  
+        EC2_USER = 'ubuntu'    
     }
 
     stages {
@@ -16,9 +16,9 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 script {
-                    // Use SSH credentials stored in Jenkins
+                    
                     withCredentials([sshUserPrivateKey(credentialsId: 'mysshprikey', keyFileVariable: 'SSH_KEY')]) {
-                        // SSH into the EC2 instance and run commands using a heredoc
+                       
                         sh '''
                             ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_IP} <<EOF
                             sudo apt update
