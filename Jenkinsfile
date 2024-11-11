@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        EC2_IP = '35.154.122.163'  
+        EC2_IP = '65.2.82.41'  
         EC2_USER = 'ubuntu'    
     }
  
