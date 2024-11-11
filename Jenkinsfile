@@ -5,7 +5,7 @@ pipeline {
         EC2_IP = '35.154.122.163'  
         EC2_USER = 'ubuntu'    
     }
-
+ 
     stages {
         stage('Checkout') {
             steps {
